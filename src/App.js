@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
+import Notification from './components/Notification'
 
 const storageKey = 'loggedBlogappUser'
 
@@ -13,6 +14,11 @@ const App = () => {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
+  const [notification, setNotification] = useState({
+    text: null,
+    type: '',
+    timeout: null,
+  })
 
   useEffect(() => {
     blogService.getAll().then((blogs) => setBlogs(blogs))
@@ -24,6 +30,20 @@ const App = () => {
       setUser(JSON.parse(loggedUserJSON))
     }
   }, [])
+
+  const notifyWith = (message, type = 'success') => {
+    clearTimeout(notification.timeout)
+    setNotification({
+      message,
+      type,
+      timeout: setTimeout(() => {
+        setNotification({
+          text: null,
+          type: '',
+        })
+      }, 5000),
+    })
+  }
 
   const handleLogin = async (event) => {
     event.preventDefault()
@@ -38,8 +58,9 @@ const App = () => {
       setUser(user)
       setUsername('')
       setPassword('')
+      notifyWith('login success', 'success')
     } catch (exception) {
-      console.log('Wrong credentials')
+      notifyWith('wrong username or password', 'error')
     }
   }
 
@@ -55,14 +76,19 @@ const App = () => {
       setAuthor('')
       setUrl('')
       setBlogs(blogs.concat(newBlog))
+      notifyWith(
+        `a new blog ${newBlog.title} by ${newBlog.author} added`,
+        'success'
+      )
     } catch (exception) {
-      console.log('Exception adding blog')
+      notifyWith('error adding blog', 'error')
     }
   }
 
   const loginForm = () => (
     <form onSubmit={handleLogin}>
       <h2>Log in to application</h2>
+      <Notification notification={notification} />
       <div>
         username
         <input
@@ -88,6 +114,7 @@ const App = () => {
   const blogList = () => (
     <div>
       <h2>blogs</h2>
+      <Notification notification={notification} />
       <p>
         {user.name} logged in
         <button
