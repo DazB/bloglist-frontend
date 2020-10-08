@@ -28,7 +28,11 @@ const App = () => {
   }, [])
 
   useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs))
+    const fetchBlogs = async () => {
+      const blogs = await blogService.getAll()
+      setBlogs(blogs)
+    }
+    fetchBlogs()
   }, [])
 
   const notifyWith = (message, type = 'success') => {
@@ -80,6 +84,24 @@ const App = () => {
     }
   }
 
+  const addLike = async (blogObject) => {
+    try {
+      const likedBlog = {
+        ...blogObject,
+        likes: blogObject.likes + 1,
+        user: blogObject.user.id,
+      }
+      const updatedBlog = await blogService.update(likedBlog.id, likedBlog)
+      setBlogs(
+        blogs.map((blog) =>
+          blog.id !== updatedBlog.id ? blog : { ...blog, likes: blog.likes + 1 }
+        )
+      )
+    } catch (exception) {
+      notifyWith('error liking blog', 'error')
+    }
+  }
+
   const loginForm = () => (
     <LoginForm
       username={username}
@@ -111,7 +133,7 @@ const App = () => {
         <BlogFrom createBlog={createBlog} />
       </Togglable>
       {blogs.map((blog) => (
-        <Blog key={blog.id} blog={blog} />
+        <Blog key={blog.id} blog={blog} addLike={addLike} />
       ))}
     </div>
   )
