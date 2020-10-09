@@ -29,8 +29,8 @@ const App = () => {
 
   useEffect(() => {
     const fetchBlogs = async () => {
-      const blogs = await blogService.getAll()
-      setBlogs(blogs)
+      const fetchedBlogs = await blogService.getAll()
+      setBlogs(fetchedBlogs)
     }
     fetchBlogs()
   }, [])
@@ -132,9 +132,13 @@ const App = () => {
         <h2>create new</h2>
         <BlogFrom createBlog={createBlog} />
       </Togglable>
-      {blogs.map((blog) => (
-        <Blog key={blog.id} blog={blog} addLike={addLike} />
-      ))}
+      {blogs
+        .sort((blog1, blog2) => {
+          return blog2.likes - blog1.likes
+        })
+        .map((blog) => (
+          <Blog key={blog.id} blog={blog} addLike={addLike} />
+        ))}
     </div>
   )
 
