@@ -24,6 +24,7 @@ const App = () => {
     const loggedUserJSON = window.localStorage.getItem(storageKey)
     if (loggedUserJSON) {
       setUser(JSON.parse(loggedUserJSON))
+      blogService.setToken(JSON.parse(loggedUserJSON).token)
     }
   }, [])
 
@@ -84,7 +85,7 @@ const App = () => {
     }
   }
 
-  const addLike = async (blogObject) => {
+  const handleLike = async (blogObject) => {
     try {
       const likedBlog = {
         ...blogObject,
@@ -99,6 +100,22 @@ const App = () => {
       )
     } catch (exception) {
       notifyWith('error liking blog', 'error')
+    }
+  }
+
+  const handleRemove = async (blog) => {
+    if (window.confirm(`Remove blog ${blog.title} by ${blog.author}?`)) {
+      try {
+        await blogService.deleteBlog(blog.id)
+        setBlogs(blogs.filter((b) => b.id !== blog.id))
+        notifyWith('blog removed', 'success')
+      } catch (exception) {
+        if (exception.response.status === 401) {
+          notifyWith('only the owner of a blog can remove it', 'error')
+        } else {
+          notifyWith('error removing blog', 'error')
+        }
+      }
     }
   }
 
@@ -137,7 +154,13 @@ const App = () => {
           return blog2.likes - blog1.likes
         })
         .map((blog) => (
-          <Blog key={blog.id} blog={blog} addLike={addLike} />
+          <Blog
+            key={blog.id}
+            blog={blog}
+            user={user}
+            handleLike={handleLike}
+            handleRemove={handleRemove}
+          />
         ))}
     </div>
   )
