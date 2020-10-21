@@ -39,7 +39,9 @@ const Blog = ({ blog, handleLike, handleRemove, user }) => {
         </div>
         <div>{blog.user.name}</div>
         <div style={showIfUserLoggedIn}>
-          <button onClick={() => handleRemove(blog)}>remove</button>
+          <button id="button-remove" onClick={() => handleRemove(blog)}>
+            remove
+          </button>
         </div>
       </div>
     </div>
