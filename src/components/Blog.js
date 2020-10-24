@@ -32,7 +32,7 @@ const Blog = ({ blog, handleLike, handleRemove, user }) => {
       <div style={showWhenVisible} className="hiddenContent">
         <div>{blog.url}</div>
         <div>
-          likes {blog.likes}{' '}
+          <span className="blog-likes">{`likes ${blog.likes}`}</span>
           <button id="button-like" onClick={() => handleLike(blog)}>
             like
           </button>

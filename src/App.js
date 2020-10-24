@@ -149,19 +149,21 @@ const App = () => {
         <h2>create new</h2>
         <BlogFrom createBlog={createBlog} />
       </Togglable>
-      {blogs
-        .sort((blog1, blog2) => {
-          return blog2.likes - blog1.likes
-        })
-        .map((blog) => (
-          <Blog
-            key={blog.id}
-            blog={blog}
-            user={user}
-            handleLike={handleLike}
-            handleRemove={handleRemove}
-          />
-        ))}
+      <div id="blogs">
+        {blogs
+          .sort((blog1, blog2) => {
+            return blog2.likes - blog1.likes
+          })
+          .map((blog) => (
+            <Blog
+              key={blog.id}
+              blog={blog}
+              user={user}
+              handleLike={handleLike}
+              handleRemove={handleRemove}
+            />
+          ))}
+      </div>
     </div>
   )
 

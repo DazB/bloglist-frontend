@@ -75,7 +75,7 @@ describe('Blog app', function () {
         cy.get('.success').should('contain', 'blog removed')
       })
 
-      it.only('it cannot be deleted by a user who did not created it', function () {
+      it('it cannot be deleted by a user who did not created it', function () {
         const user = {
           name: 'bum',
           username: 'bum',
@@ -86,6 +86,32 @@ describe('Blog app', function () {
         cy.login({ username: 'bum', password: 'bum' })
         cy.get('#button-view').click()
         cy.get('#button-remove').should('not.be.visible')
+      })
+
+      describe('and multiple blogs exists', function () {
+        beforeEach(function () {
+          cy.createBlog({
+            title: 'Title 2',
+            author: 'Author 2',
+            url: 'Url 2',
+            likes: 5,
+          })
+          cy.createBlog({
+            title: 'Title 3',
+            author: 'Author 3',
+            url: 'Url 3',
+            likes: 6,
+          })
+        })
+
+        it('blogs are ordered according to likes, with the blog with the most likes being first', function () {
+          cy.get('.blog-likes').then(($likes) => {
+            let likesArray = $likes.toArray().map((el) => {
+              return Cypress.$(el).text()
+            })
+            cy.wrap(likesArray).should('equal', likesArray.sort())
+          })
+        })
       })
     })
   })
